@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import sys
+import os
 from workflow import Workflow3
 import leancloud
-import dateutil.parser
+import util
 
 log = None
 
@@ -22,10 +23,10 @@ def get_file_and_upload(wf):
         upload_name = "%s.%s" % (int(time.time() * 1000), format)
         tmp_file = util.try_compress_png(img_file, format)
         upload_file_path = "/tmp/%s" % upload_name
-        # upload_file = open(upload_file_path, "w+b")
         shutil.copy(tmp_file.name, upload_file_path)
         url, delete = upload_smms(upload_file_path, upload_name)
         leancloud.save_url(url, delete, wf)
+        os.remove(upload_file_path)
         return url, upload_name
     else:
         # 没有图片
@@ -44,12 +45,11 @@ def get_img_list(wf):
                 url = img[u'url']
                 delete = img[u'delete']
                 arg = u"url:%s delete:%s" % (url, delete)
-                created_at = dateutil.parser.parse(img[u'createdAt'])
+                created_at = util.get_time(img[u'createdAt'])
                 wf.add_item(
                     url,              # title
                     # subtitle
-                    u'创建时间:%s' % created_at.strftime(
-                        '%Y-%m-%d %H:%M:%S'),
+                    u'创建时间:%s' % created_at,
                     arg=arg,
                     quicklookurl=url,
                     valid=True
