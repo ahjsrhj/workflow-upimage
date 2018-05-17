@@ -88,8 +88,7 @@ def delete_url(wf, delete):
 
 
 def main(wf):
-    # args = wf.args[0]
-    args = 'list'
+    args = wf.args[0]
     log.debug(args)
     if args == 'up':
         # 上传
